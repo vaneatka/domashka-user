@@ -6,10 +6,10 @@
       private $avatar;
 
       public function __construct($username, $email, $password, $avatar){
-        setUsername($username);
-        setEmail($email);
-        setPassword($password);
-        setAvatar($avatar);
+        $this->setUsername($username);
+        $this->setEmail($email);
+        $this->setPassword($password);
+        $this->setAvatar($avatar);
       }
 
       public function __toString(){
@@ -17,13 +17,15 @@
       }
 
       public function save(){
-        $time = date('Y-m-d')
-        file_put_content(serialize($this), "/database/.{$time}")
-
+        $time = date('Y-m-d');
+        file_put_contents("database/{$time}.ser", serialize($this));
+        if (isset($this->avatar)){
+          $adr = "avatars/$this->username.jpg";
+          file_put_contents($adr, file_get_contents($this->avatar) );
+        }
       }
 
-
-
+      
 
 
         // добавить в класс 4 приватных свойств:
@@ -91,10 +93,9 @@
     public function setPassword($password)
     {
       if(preg_match('/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/', $password)) {
-
         $this->password = $password;
       }else {
-        print "Wrong email syntax";
+        print "Wrong password syntax";
          }
     }
 
@@ -105,14 +106,22 @@
 
     public function setAvatar($avatar)
     {
-      if(preg_match('/^[^?]*\.(jpg|jpeg|gif|png)/', $password)) {
+      if(preg_match('/^[^?]*\.(jpg|jpeg|gif|png)/', $avatar)) {
         $this->avatar = $avatar;
-
       }else {
-        print "Wrong email syntax";
+        print "Wrong image syntax";
          }
-        return $this;
     }
+
+      public function load($date){
+        $loaded = unserialize(file_get_contents("database/$date.ser"));  
+        var_dump($loaded);
+        $this->setAvatar($loaded->avatar);      
+        $this->setEmail($loaded->email);      
+        $this->setPassword($loaded->password);      
+        $this->setUsername($loaded->username);     
+        
+      }
 
 }
 ?>
